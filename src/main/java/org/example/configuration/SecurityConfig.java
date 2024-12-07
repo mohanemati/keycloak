@@ -29,33 +29,23 @@ public class SecurityConfig {
         this.jwtService = jwtService;
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .authorizeRequests(authorize -> authorize
-                        .requestMatchers("/api/user/get-token").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) -> {
-
-                            BaseResponseDto baseResponse = new BaseResponseDto();
-                            baseResponse.setMessage("شما احراز هویت نشده‌اید یا توکن معتبر نیست.");
 
 
-                            ObjectMapper mapper = new ObjectMapper();
-                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            response.setCharacterEncoding("UTF-8");
-                            response.getWriter().write(mapper.writeValueAsString(baseResponse));
-                        })
-                );
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+            http
+                    .csrf(csrf -> csrf.disable())
+                    .authorizeRequests(authorize -> authorize
+                            .requestMatchers("/api/user/get-token").permitAll()
+                            .anyRequest().authenticated()
+                    )
+                    .addFilterBefore(new CustomTokenFilter(), UsernamePasswordAuthenticationFilter.class) ;
 
-        return http.build();
+            return http.build();
+        }
     }
-}
+
+
 
 
 

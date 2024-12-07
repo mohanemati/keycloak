@@ -37,6 +37,7 @@ public class TestApi {
     }
     @PostMapping("/get-token")
     public ResponseEntity<Map<String, Object>> getToken(@RequestBody LoginRequest loginRequest) {
+        System.out.println("hi:)");
         String username = loginRequest.getUsername();
         String password = loginRequest.getPassword();
         System.out.println("username" + username);
