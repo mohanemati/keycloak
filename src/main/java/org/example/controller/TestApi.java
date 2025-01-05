@@ -129,25 +129,60 @@ public class TestApi {
 //        }
 //    }
 
-    @GetMapping("/verify-tokenn")
-    public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String authorizationHeader) {
+//    @GetMapping("/verify-tokenn")
+//    public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String authorizationHeader) {
+//        System.out.println("validateToken hastim:)");
+//
+//
+//
+//
+//        // استخراج توکن از هدر Authorization
+//        String token = extractTokenFromHeader(authorizationHeader);
+//
+//        // چک کردن اعتبار توکن
+//        if (token == null || !jwtService.isTokenValid(token)) {
+//            return ResponseEntity.status(401).body("Invalid token");
+//        }
+//
+//        // استخراج نام کاربری از توکن
+//        String username = jwtService.extractUsername(token);
+//        System.out.println("Authorization Header: " + authorizationHeader);
+//
+//        return ResponseEntity.ok("Token is valid. Username: " + username);
+//    }
+//
+
+    @GetMapping("/verify-token")
+    public ResponseEntity<String> validateToken(@RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
         System.out.println("validateToken hastim:)");
 
-        // استخراج توکن از هدر Authorization
-        String token = extractTokenFromHeader(authorizationHeader);
-
-        // چک کردن اعتبار توکن
-        if (token == null || !jwtService.isTokenValid(token)) {
-            return ResponseEntity.status(401).body("Invalid token");
+        // Ensure Authorization header is not null and starts with "Bearer "
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Authorization header is missing or malformed");
         }
 
-        // استخراج نام کاربری از توکن
+        // Extract the token from the Authorization header
+        String token = extractTokenFromHeader(authorizationHeader);
+
+        // Validate the token
+        if (token == null || !jwtService.isTokenValid(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid token");
+        }
+
+        // Extract username from the token
         String username = jwtService.extractUsername(token);
+        System.out.println("Token is valid. Username: " + username);
+
+        // Return a valid response with the username
         return ResponseEntity.ok("Token is valid. Username: " + username);
     }
 
 
-//    private String extractTokenFromHeader(String authorizationHeader) {
+
+
+    //    private String extractTokenFromHeader(String authorizationHeader) {
 //        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
 //            throw new IllegalArgumentException("Invalid Authorization header");
 //        }
